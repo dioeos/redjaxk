@@ -5,37 +5,72 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-26.05";
   };
 
-  outputs = { self, nixpkgs }:
-  let
-    platforms = [
-      "x86_64-linux"
-    ];
+  outputs =
+    { self, nixpkgs }:
+    let
+      platforms = [
+        "x86_64-linux"
+      ];
 
-    forAllPlatforms = f: nixpkgs.lib.genAttrs platforms (sys: f nixpkgs.legacyPackages.${sys});
-  in
-  {
-    devShells = forAllPlatforms (pkgs: {
-      default = pkgs.mkShell {
-        packages = with pkgs; [
-          cargo
-          rustc
-          rustfmt
-          clippy
-          rust-analyzer
-          cargo-watch
+      forAllPlatforms = f: nixpkgs.lib.genAttrs platforms (sys: f nixpkgs.legacyPackages.${sys});
 
-          sqlx-cli
-          sqlite
+      mkRedjaxkPackages = pkgs: {
+        agent = pkgs.rustPlatform.buildRustPackage {
+          pname = "redjaxk-agent";
+          version = "0.1.0";
 
-          nixd
-          nixfmt
-          just
+          src = ./.;
+          cargoLock.lockFile = ./Cargo.lock;
 
-          # protoc
-          protobuf
-          stdenv.cc
-        ];
+          cargoBuildFlags = [
+            "-p"
+            "redjaxk-agent"
+          ];
+        };
       };
-    });
-  };
+    in
+    {
+      packages = forAllPlatforms (pkgs: mkRedjaxkPackages pkgs);
+
+      homeManagerModules.default = { pkgs, lib, ...}: {
+        imports = [ ./redjaxk-module.nix ];
+
+        services.redjaxk-agent = {
+          package = lib.mkDefault
+            self.packages.${pkgs.stdenv.hostPlatform.system}.agent;
+        };
+      };
+
+
+      devShells = forAllPlatforms (
+        pkgs:
+        let
+          redjaxkPackages = mkRedjaxkPackages pkgs;
+        in
+        {
+          default = pkgs.mkShell {
+            inputsFrom = [
+              redjaxkPackages.agent
+            ];
+            packages = with pkgs; [
+              rustfmt
+              clippy
+              rust-analyzer
+              cargo-watch
+
+              sqlx-cli
+              sqlite
+
+              nixd
+              nixfmt
+              just
+
+              # protoc
+              protobuf
+              stdenv.cc
+            ];
+          };
+        }
+      );
+    };
 }
