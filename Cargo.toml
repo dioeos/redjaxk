@@ -1,0 +1,25 @@
+[workspace]
+resolver = "3"
+members = [
+  "src/libs/redjaxk-core",
+
+  "src/services/redjaxk-agent",
+  "src/services/redjaxk-server",
+]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.95"
+
+[workspace.dependencies]
+async-trait = "0.1.92"
+anyhow = "1.0"
+axum = "0.8.9"
+maud = "0.27.0"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0.20"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "std", "fmt"] }
+

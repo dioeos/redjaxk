@@ -1,0 +1,11 @@
+[package]
+name = "redjaxk-server"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+maud.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
