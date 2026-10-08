@@ -1,0 +1,17 @@
+
+syntax = "proto3";
+
+package redjaxk.v1;
+
+// The node agent definition
+service NodeAgent {
+  // Retrieves node's status
+  rpc GetStatus (StatusRequest) returns (StatusReply) {}
+}
+
+message StatusRequest {}
+
+// The response message containing the node's ID
+message StatusReply {
+  string node_id = 1;
+}

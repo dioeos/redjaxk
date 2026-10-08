@@ -30,6 +30,10 @@
           nixd
           nixfmt
           just
+
+          # protoc
+          protobuf
+          stdenv.cc
         ];
       };
     });
