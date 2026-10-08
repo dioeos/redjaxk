@@ -22,12 +22,14 @@
           rustfmt
           clippy
           rust-analyzer
+          cargo-watch
 
           sqlx-cli
           sqlite
 
           nixd
           nixfmt
+          just
         ];
       };
     });
