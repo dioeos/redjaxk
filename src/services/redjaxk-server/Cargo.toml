@@ -6,6 +6,7 @@ rust-version.workspace = true
 
 [dependencies]
 axum.workspace = true
+axum-htmx = "0.8.1"
 maud.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
