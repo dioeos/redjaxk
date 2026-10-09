@@ -5,8 +5,11 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+redjaxk-protocol = { path = "../../libs/redjaxk-protocol" }
 axum.workspace = true
 axum-htmx = "0.8.1"
 maud.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
+tonic.workspace = true
+tower-http = { version = "0.7.1", features = ["fs"] }
