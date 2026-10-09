@@ -1,8 +1,0 @@
-[package]
-name = "redjaxk-core"
-version = "0.1.0"
-edition.workspace = true
-rust-version.workspace = true
-
-[dependencies]
-thiserror.workspace = true
