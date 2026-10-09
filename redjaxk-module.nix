@@ -22,7 +22,7 @@ in
   config = lib.mkIf cfg.enable {
     assertions = [
       {
-        assertion = cfg.environment ? REDJAXX_NODE_ID && cfg.environment.REDJAXX_NODE_ID != "";
+        assertion = cfg.environment ? REDJAXK_NODE_ID && cfg.environment.REDJAXK_NODE_ID != "";
         message = "services.redjaxk-agent.environment.REDJAXK_NODE_ID must be set.";
       }
     ];
