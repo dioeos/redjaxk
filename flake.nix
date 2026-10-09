@@ -26,6 +26,8 @@
             "-p"
             "redjaxk-agent"
           ];
+
+          nativeBuildInputs = [ pkgs.protobuf ];
         };
       };
     in
@@ -65,8 +67,6 @@
               nixfmt
               just
 
-              # protoc
-              protobuf
               stdenv.cc
             ];
           };
