@@ -1,4 +1,3 @@
-
 syntax = "proto3";
 
 package redjaxk.v1;
@@ -7,11 +6,26 @@ package redjaxk.v1;
 service NodeAgent {
   // Retrieves node's status
   rpc GetStatus (StatusRequest) returns (StatusReply) {}
+
+  rpc ListContainers (ListContainersRequest)
+    returns (ListContainersReply);
 }
 
 message StatusRequest {}
+message ListContainersRequest {}
 
 // The response message containing the node's ID
 message StatusReply {
   string node_id = 1;
+}
+
+message Container {
+  string id = 1;
+  string image = 2;
+  string redjaxk_name = 3;
+  string redjaxk_url = 4;
+}
+
+message ListContainersReply {
+  repeated Container containers = 1;
 }

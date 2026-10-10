@@ -1,14 +1,17 @@
+mod error;
 mod state;
 
 use std::time::Duration;
 
 use axum::{Router, extract::State, routing::get};
 use maud::{DOCTYPE, Markup, html};
-use redjaxk_protocol::v1::{StatusRequest, node_agent_client::NodeAgentClient};
+use redjaxk_protocol::v1::{
+    Container, ListContainersRequest, StatusRequest, node_agent_client::NodeAgentClient,
+};
 use tonic::transport::Channel;
 use tower_http::services::ServeDir;
 
-use crate::state::AppState;
+use crate::{error::Error, state::AppState};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -27,12 +30,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/", get(index))
         .route("/fragments/nodes", get(node_status))
+        .route("/fragments/services", get(containers))
         .nest_service(
-            "/static", 
-            ServeDir::new(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/static"
-            )))
+            "/static",
+            ServeDir::new(concat!(env!("CARGO_MANIFEST_DIR"), "/static")),
+        )
         .with_state(state);
 
     axum::serve(listener, app).await.unwrap();
@@ -48,6 +50,17 @@ async fn check_agent_online(state: &AppState) -> bool {
         .is_ok_and(|res| res.is_ok())
 }
 
+async fn discover_podman_services(state: &AppState) -> Result<Vec<Container>, Error> {
+    let mut client = state.agent.clone();
+
+    let response = client
+        .list_containers(ListContainersRequest {})
+        .await
+        .unwrap();
+
+    Ok(response.into_inner().containers)
+}
+
 fn render_node_status(online: bool) -> Markup {
     html! {
         p {
@@ -57,10 +70,21 @@ fn render_node_status(online: bool) -> Markup {
     }
 }
 
-async fn index(State(state): State<AppState>) -> Markup {
-    let online = check_agent_online(&state).await;
-
+fn render_containers(containers: Vec<Container>) -> Markup {
     html! {
+        @for container in containers {
+            div {
+                (container.id) " - " (container.image) " - " (container.redjaxk_url)
+            }
+        }
+    }
+}
+
+async fn index(State(state): State<AppState>) -> Result<Markup, Error> {
+    let online = check_agent_online(&state).await;
+    let containers = discover_podman_services(&state).await?;
+
+    Ok(html! {
         (DOCTYPE)
         html {
             head {
@@ -69,7 +93,7 @@ async fn index(State(state): State<AppState>) -> Markup {
             }
             body {
                 h1 { "Dashboard" }
-                
+
                 button
                     hx-get="/fragments/nodes"
                     hx-target="#node-status"
@@ -81,12 +105,29 @@ async fn index(State(state): State<AppState>) -> Markup {
                 div id="node-status" {
                     (render_node_status(online))
                 }
+
+                button
+                    hx-get="/fragments/services"
+                    hx-target="#node-services"
+                    hx-swap="innherHTML"
+                {
+                    "Discover"
+                }
+
+                div id="node-services" {
+                    (render_containers(containers))
+                }
             }
         }
-    }
+    })
 }
 
 async fn node_status(State(state): State<AppState>) -> Markup {
     let online = check_agent_online(&state).await;
     render_node_status(online)
+}
+
+async fn containers(State(state): State<AppState>) -> Result<Markup, Error> {
+    let containers = discover_podman_services(&state).await?;
+    Ok(render_containers(containers))
 }
