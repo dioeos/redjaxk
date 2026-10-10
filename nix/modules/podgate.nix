@@ -11,20 +11,20 @@ in
       type = lib.types.package;
       description = "Package containing redjaxk-podgate";
     };
+  };
 
-    config = lib.mkIf cfg.enable {
-      home.packages = [
-        cfg.package
-      ];
+  config = lib.mkIf cfg.enable {
+    home.packages = [
+      cfg.package
+    ];
 
-      systemd.user.services.redjaxk-podgate = {
-        Unit.Description = "Redjaxk Podgate";
-        Service = {
-          ExecStart = "${cfg.package}/bin/redjaxk-podgate";
-          Restart = "on-failure";
+    systemd.user.services.redjaxk-podgate = {
+      Unit.Description = "Redjaxk Podgate";
+      Service = {
+        ExecStart = "${cfg.package}/bin/redjaxk-podgate";
+        Restart = "on-failure";
 
-          Install.WantedBy = [ "default.target" ];
-        };
+        Install.WantedBy = [ "default.target" ];
       };
     };
   };
