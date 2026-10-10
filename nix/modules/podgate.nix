@@ -24,8 +24,8 @@ in
         ExecStart = "${cfg.package}/bin/redjaxk-podgate";
         Restart = "on-failure";
 
-        Install.WantedBy = [ "default.target" ];
       };
+      Install.WantedBy = [ "default.target" ];
     };
   };
 }
