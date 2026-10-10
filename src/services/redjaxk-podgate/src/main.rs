@@ -33,7 +33,7 @@ async fn main() -> Result<(), Error> {
             source: err,
         })?;
 
-    let mode = 0o600;
+    let mode = 0o660;
     fs::set_permissions(REDJAXK_PODMAN_SOCK, fs::Permissions::from_mode(mode)).map_err(|err| {
         Error::SetPodmanSocketPermissions {
             mode,
