@@ -29,17 +29,40 @@
 
           nativeBuildInputs = [ pkgs.protobuf ];
         };
+
+        podgate = pkgs.rustPlatform.buildRustPackage {
+          pname = "redjaxk-podgate";
+          version = "0.1.0";
+
+          src = ./.;
+          cargoLock.lockFile = ./Cargo.lock;
+
+          cargoBuildFlags = [
+            "-p"
+            "redjaxk-podgate"
+          ];
+
+          nativeBuildINputs = [ pkgs.protobuf ];
+        };
       };
     in
     {
       packages = forAllPlatforms (pkgs: mkRedjaxkPackages pkgs);
 
       homeManagerModules.default = { pkgs, lib, ...}: {
-        imports = [ ./redjaxk-module.nix ];
+        imports = [
+          ./nix/modules/agent.nix
+          ./nix/modules/podgate.nix
+        ];
 
         services.redjaxk-agent = {
           package = lib.mkDefault
             self.packages.${pkgs.stdenv.hostPlatform.system}.agent;
+        };
+
+        services.redjaxk-podgate = {
+          package = lib.mkDefault
+            self.packages.${pkgs.stdenv.hostPlatform.system}.podgate;
         };
       };
 

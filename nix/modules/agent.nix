@@ -15,7 +15,7 @@ in
     environment = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = { };
-      description = "Environment variables for redjaxk-agnent";
+      description = "Environment variables for redjaxk-agent";
     };
   };
 
