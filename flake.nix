@@ -42,7 +42,7 @@
             "redjaxk-podgate"
           ];
 
-          nativeBuildINputs = [ pkgs.protobuf ];
+          nativeBuildInputs = [ pkgs.protobuf ];
         };
       };
     in
